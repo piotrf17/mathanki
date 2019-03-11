@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <title>Math Anki Card Editor</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <script src="{{ url_for('static', filename='js/jquery-3.2.1.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lodash.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/vue.js') }}"></script>
+    <!-- TODO(piotrf): have mathjax local -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_SVG-full"></script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.processSectionDelay = 0;
+      MathJax.Hub.Config({
+        messageStyle:"none",
+        showProcessingMessages:false,
+	tex2jax:{
+            inlineMath: [ ['$','$'], ['\\(','\\)'] ],
+            displayMath: [ ['$$','$$'], ['\\[','\\]'] ],
+            processEscapes:true
+        }
+      });
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/stdtheme.css') }}">    
+  </head>
+  <body>
+    <div class="title">
+      <h1>Math Anki</h1>
+    </div>
+    <div id="app">
+      <div id="cards">
+	<div v-for="(card, index) in cards" :key="card.id">
+	  <!-- TODO(piotrf): using v-html on user content is a bad idea! -->
+	  <div v-if="card.editing" class="editingcardpair">
+	    <div class="editingcardrow">
+	      <div v-html="card.front" class="card"></div>
+	      <div v-html="card.back" class="card"></div>
+	    </div>
+	    <div class="editingcardrow">
+	      <div class="editingcard">
+		<textarea v-model="card.front" draggable='false'></textarea>
+	      </div>
+	      <div class="editingcard">
+		<textarea v-model="card.back" draggable='false'></textarea>
+	      </div>
+	    </div>
+	    <div class="editingcardbuttons">
+	      <button class="savebutton">Save</button>
+	      <button class="cancelbutton" v-on:click.stop="cancelEdit(index)">Cancel</button>
+	    </div>
+	  </div>	  
+	  <div v-else class="cardpair" v-on:click="startEdit(index)">
+	    <div v-html="card.front" class="card"></div>
+	    <div v-html="card.back" class="card"></div>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+  <script src="{{ url_for('static', filename='js/card_editor.js') }}"></script>
+</html>
