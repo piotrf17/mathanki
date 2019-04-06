@@ -40,6 +40,10 @@ var app = new Vue({
   },
   created: function() {
     this.debouncedRenderMathJax = _.debounce(this.renderMathJax, 100);
+/*    $.getJSON('/api/cards/' + data.word).done(function(recvd) {
+      data.definitions = recvd.definitions;
+      data.examples = recvd.examples;
+    });*/
   },
   mounted(){
     this.renderMathJax();

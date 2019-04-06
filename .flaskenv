@@ -1,0 +1,1 @@
+FLASK_APP=card_editor
