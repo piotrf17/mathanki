@@ -1,0 +1,30 @@
+// Notes in the Math Anki editor.
+// A note is an Anki concept - cards are created from a note.
+
+package math_anki;
+
+message Note {
+  // Unique identifier for the note, used to dedup in Anki.
+  optional int64 id = 1;
+
+  // Front of the card.
+  optional string front = 2;
+
+  // Back of the card.
+  optional string back = 3;
+
+  // List of tags associated with this note.
+  repeated string tag = 4;
+
+  // ==============================================
+  // Various stats, not exported to Anki.
+
+  // Unix timestamp (in seconds) when the note was created.
+  optional double created_ts = 5;
+
+  // Unix timestamp (in seconds) when the note was last edited.
+  optional double last_edited_ts = 6;
+
+  // Unix timestamp (in seconds) when the note was last exported.
+  optional int64 last_exported_ts = 7;
+}

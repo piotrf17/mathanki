@@ -1,6 +1,8 @@
-DROP TABLE IF EXISTS cards;
+DROP TABLE IF EXISTS notes;
 
-CREATE TABLE cards (
+CREATE TABLE notes (
+  -- We use AUTOINCREMENT here, because we do not want to reuse old rowids for
+  -- new notes to preserve compatibility with anki exports.
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  card TEXT NOT NULL
+  note TEXT NOT NULL
 );

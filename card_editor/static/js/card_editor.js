@@ -1,5 +1,6 @@
 var data = {
   cards: [
+    /*
     {
       id: 1,
       front: 'How do you represent the hypothesis for linear regression with \\(n\\) dimensional features?',
@@ -24,6 +25,7 @@ var data = {
       back: 'Yes',
       editing: false,
     }
+*/
   ],
 };
 
@@ -40,12 +42,16 @@ var app = new Vue({
   },
   created: function() {
     this.debouncedRenderMathJax = _.debounce(this.renderMathJax, 100);
-/*    $.getJSON('/api/cards/' + data.word).done(function(recvd) {
-      data.definitions = recvd.definitions;
-      data.examples = recvd.examples;
-    });*/
   },
   mounted(){
+    fetch('/api/cards')
+      .then(r => r.json())
+      .then(json => {
+	this.cards = json;
+	for (var i = 0; i < data.cards.length; ++i) {
+	  Vue.set(this.cards[i], 'editing', false);
+	}
+      });
     this.renderMathJax();
   },
   methods: {

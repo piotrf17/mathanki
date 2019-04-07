@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, jsonify
+from google.protobuf.json_format import MessageToDict
 
 from card_editor.db import get_db
 
@@ -11,6 +12,8 @@ def index():
 @bp.route("/api/cards")
 def cards():
   db = get_db()
-  raw_cards = db.execute('SELECT * FROM cards').fetchall()
-  cards = []
-  return jsonify(cards)
+  cards = db.get_notes()
+  json_cards = []
+  for card in cards:
+    json_cards.append(MessageToDict(card))
+  return jsonify(json_cards)
