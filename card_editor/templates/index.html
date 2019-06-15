@@ -5,8 +5,7 @@
     <script src="{{ url_for('static', filename='js/jquery-3.2.1.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lodash.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/vue.js') }}"></script>
-    <!-- TODO(piotrf): have mathjax local -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_SVG-full"></script>
+    <script src="{{ url_for('static', filename='MathJax/MathJax.js') }}?config=TeX-AMS_SVG-full"></script>
     <script type="text/x-mathjax-config">
       MathJax.Hub.processSectionDelay = 0;
       MathJax.Hub.Config({
@@ -27,29 +26,29 @@
     </div>
     <div id="app">
       <div id="cards">
-	<div v-for="(card, index) in cards" :key="card.id">
+	<div v-for="(card, index) in cards" :key="card.data.id">
 	  <!-- TODO(piotrf): using v-html on user content is a bad idea! -->
 	  <div v-if="card.editing" class="editingcardpair">
 	    <div class="editingcardrow">
-	      <div v-html="card.front" class="card"></div>
-	      <div v-html="card.back" class="card"></div>
+	      <div v-html="card.data.front" class="card"></div>
+	      <div v-html="card.data.back" class="card"></div>
 	    </div>
 	    <div class="editingcardrow">
 	      <div class="editingcard">
-		<textarea v-model="card.front" draggable='false'></textarea>
+		<textarea v-model="card.data.front" draggable='false'></textarea>
 	      </div>
 	      <div class="editingcard">
-		<textarea v-model="card.back" draggable='false'></textarea>
+		<textarea v-model="card.data.back" draggable='false'></textarea>
 	      </div>
 	    </div>
 	    <div class="editingcardbuttons">
-	      <button class="savebutton">Save</button>
+	      <button class="savebutton" v-on:click.stop="saveEdit(index)">Save</button>
 	      <button class="cancelbutton" v-on:click.stop="cancelEdit(index)">Cancel</button>
 	    </div>
 	  </div>	  
 	  <div v-else class="cardpair" v-on:click="startEdit(index)">
-	    <div v-html="card.front" class="card"></div>
-	    <div v-html="card.back" class="card"></div>
+	    <div v-html="card.data.front" class="card"></div>
+	    <div v-html="card.data.back" class="card"></div>
 	  </div>
 	</div>
       </div>

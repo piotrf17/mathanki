@@ -19,18 +19,28 @@ class NoteDB(object):
     self.conn = conn
 
   def create(self, schema):
+    """Create a new database by executing 'schema'."""
     self.conn.executescript(schema)
 
   def close(self):
+    """Close the database connection."""
     self.conn.close()
 
   def insert_note(self, note):
+    """Insert a new note into the database.
+    
+    The note should have front and back filled in. The id must not be set,
+    and will be assigned in this function.
+
+    Commits to the database after insert.
+
+    TODO(piotrf): verify that we can't insert an already inserted note.
+    """
     assert not note.HasField('id')
     assert note.HasField('front')
     assert note.HasField('back')
 
-    if not note.HasField('id'):
-      note.id = random.randint(0, (1<<63)-1)
+    note.id = random.randint(0, (1<<63)-1)
     if not note.HasField('created_ts'):
       note.created_ts = time.time()
 
@@ -40,6 +50,11 @@ class NoteDB(object):
     self.conn.commit()
 
   def get_notes(self):
+    """Get all the notes in the database.
+
+    Returns a list of parsed Note protos. This won't scale to a huge number
+    of notes, but I can't imagine ever having more than 100k.
+    """
     notes = []
     raw_notes = self.conn.execute('SELECT note from notes').fetchall()
     for row in raw_notes:
@@ -47,6 +62,33 @@ class NoteDB(object):
       note.ParseFromString(row[0])
       notes.append(note)
     return notes
+
+  def update_note(self, note):
+    """Update a note in the database.
+
+    Replaces the contents of the data for note.id with 'note'. If no note exists
+    with that id, raises a KeyError.
+    """
+    assert note.HasField('id')
+    assert note.HasField('created_ts')
+    assert note.HasField('front')
+    assert note.HasField('back')
+
+    note.last_edited_ts = time.time()
+
+    note.id = 22
+
+    # First, check if this note even exists.
+    result = self.conn.execute('SELECT EXISTS(SELECT * FROM notes WHERE id=?)',
+                               (note.id,))
+    exists = result.fetchone()[0]
+    if not exists:
+      raise KeyError('No note found with id ' + str(note.id))
+
+    raw_note = note.SerializeToString()
+    self.conn.execute('UPDATE notes SET note = ? WHERE id = ?',
+                      (raw_note, note.id))
+    self.conn.commit()
 
 
 def get_db():

@@ -1,6 +1,8 @@
 // Notes in the Math Anki editor.
 // A note is an Anki concept - cards are created from a note.
 
+syntax = "proto2";
+
 package math_anki;
 
 message Note {
@@ -26,5 +28,5 @@ message Note {
   optional double last_edited_ts = 6;
 
   // Unix timestamp (in seconds) when the note was last exported.
-  optional int64 last_exported_ts = 7;
+  optional double last_exported_ts = 7;
 }

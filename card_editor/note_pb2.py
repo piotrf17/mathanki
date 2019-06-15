@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='note.proto',
   package='math_anki',
   syntax='proto2',
-  serialized_pb=_b('\n\nnote.proto\x12\tmath_anki\"\x82\x01\n\x04Note\x12\n\n\x02id\x18\x01 \x01(\x03\x12\r\n\x05\x66ront\x18\x02 \x01(\t\x12\x0c\n\x04\x62\x61\x63k\x18\x03 \x01(\t\x12\x0b\n\x03tag\x18\x04 \x03(\t\x12\x12\n\ncreated_ts\x18\x05 \x01(\x01\x12\x16\n\x0elast_edited_ts\x18\x06 \x01(\x01\x12\x18\n\x10last_exported_ts\x18\x07 \x01(\x03')
+  serialized_pb=_b('\n\nnote.proto\x12\tmath_anki\"\x82\x01\n\x04Note\x12\n\n\x02id\x18\x01 \x01(\x03\x12\r\n\x05\x66ront\x18\x02 \x01(\t\x12\x0c\n\x04\x62\x61\x63k\x18\x03 \x01(\t\x12\x0b\n\x03tag\x18\x04 \x03(\t\x12\x12\n\ncreated_ts\x18\x05 \x01(\x01\x12\x16\n\x0elast_edited_ts\x18\x06 \x01(\x01\x12\x18\n\x10last_exported_ts\x18\x07 \x01(\x01')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -77,8 +77,8 @@ _NOTE = _descriptor.Descriptor(
       options=None),
     _descriptor.FieldDescriptor(
       name='last_exported_ts', full_name='math_anki.Note.last_exported_ts', index=6,
-      number=7, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      number=7, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
