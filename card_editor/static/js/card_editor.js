@@ -132,5 +132,23 @@ var app = new Vue({
       }
       this.cards.unshift(newCard);
     },
+    deleteCard: function(index) {
+      if (!window.confirm('Really delete the card?')) {
+	return;
+      }
+      fetch('/api/cards/' + this.cards[index].data.id, {
+	method: 'DELETE',
+      }).then(response => {
+	if (response.ok) {
+	  this.cards.splice(index, 1);
+	} else {
+	  return Promise.reject(new Error(response.statusText));
+	}
+      })
+      .catch(error => {
+	console.error('Error in delete:', error.message)
+	window.alert('Error in delete: ' + error.message)
+      });
+    },
   },
 });

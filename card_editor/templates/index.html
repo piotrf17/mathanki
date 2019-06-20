@@ -45,6 +45,7 @@
 	    <div class="editingcardbuttons">
 	      <button class="savebutton" v-on:click.stop="saveEdit(index)">Save</button>
 	      <button class="cancelbutton" v-on:click.stop="cancelEdit(index)">Cancel</button>
+	      <button v-on:click.stop="deleteCard(index)">Delete</button>
 	    </div>
 	  </div>	  
 	  <div v-else class="cardpair" v-on:click="startEdit(index)">

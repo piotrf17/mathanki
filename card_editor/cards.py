@@ -37,14 +37,17 @@ def create_card():
   return make_response(jsonify(response), 200)
   
 
-@bp.route('/api/cards/<string:id>', methods=('PUT',))
-def single_card(id):
+@bp.route('/api/cards/<string:note_id>', methods=('PUT','DELETE'))
+def single_card(note_id):
   if request.method == 'PUT':
     data = request.get_json()
-    if data['id'] != id:
+    if data['id'] != note_id:
       return error_response('request id does not match data')
     note = json_format.ParseDict(data, note_pb2.Note())
     db = get_db()
     db.update_note(note)
+  elif request.method == 'DELETE':
+    db = get_db()
+    db.delete_note(note_id)
 
   return make_response(jsonify({}), 200)

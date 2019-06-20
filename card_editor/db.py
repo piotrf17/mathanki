@@ -92,6 +92,12 @@ class NoteDB(object):
                       (raw_note, note.id))
     self.conn.commit()
 
+  def delete_note(self, note_id):
+    """Delete a note from the database.
+    """
+    self.conn.execute('DELETE FROM notes WHERE id = ?', (note_id,))
+    self.conn.commit()
+
 
 def get_db():
   if 'db' not in g:
