@@ -32,7 +32,7 @@ class NoteDB(object):
     The note should have front and back filled in. The id must not be set,
     and will be assigned in this function.
 
-    Commits to the database after insert.
+    Returns the newly created id of the note.
 
     TODO(piotrf): verify that we can't insert an already inserted note.
     """
@@ -48,6 +48,8 @@ class NoteDB(object):
     self.conn.execute('INSERT INTO notes (id, note) VALUES (?, ?)',
                       (note.id, raw_note))
     self.conn.commit()
+    
+    return note.id
 
   def get_notes(self):
     """Get all the notes in the database.

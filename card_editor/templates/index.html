@@ -26,6 +26,7 @@
     </div>
     <div id="app">
       <div id="cards">
+	<button class="newcardbutton" v-on:click.stop="newCard()">New Card</button>
 	<div v-for="(card, index) in cards" :key="card.data.id">
 	  <!-- TODO(piotrf): using v-html on user content is a bad idea! -->
 	  <div v-if="card.editing" class="editingcardpair">

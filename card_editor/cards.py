@@ -7,6 +7,7 @@ from card_editor.db import get_db
 bp = Blueprint('cards', __name__)
 
 def error_response(error_text):
+  current_app.logger.error(error_text)
   data = {
     'error': error_text
   }
@@ -24,6 +25,17 @@ def cards():
   for card in cards:
     json_cards.append(json_format.MessageToDict(card))
   return jsonify(json_cards)
+
+@bp.route('/api/cards/create', methods=('PUT',))
+def create_card():
+  data = request.get_json()
+  note = json_format.ParseDict(data, note_pb2.Note())
+  db = get_db()
+  note_id = db.insert_note(note)
+  response = {}
+  response['id'] = note_id
+  return make_response(jsonify(response), 200)
+  
 
 @bp.route('/api/cards/<string:id>', methods=('PUT',))
 def single_card(id):

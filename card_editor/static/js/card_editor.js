@@ -42,30 +42,95 @@ var app = new Vue({
       this.cards[index].editing = true;
     },
     cancelEdit: function(index) {
-      this.cards[index].front = this.cards[index].data.originalFront;
-      this.cards[index].back = this.cards[index].data.originalBack;
+      // If this is a new card, we want to either outright delete it if it
+      // blank, or alert if there is anything entered before deleting. Either
+      // way, there is nothing to restore.
+      if (this.cards[index].new) {
+	if ((this.cards[index].data.front === '' &&
+	     this.cards[index].data.back === '') ||
+	    window.confirm('Do you want to lose all input and abandon this new card?')) {
+	  this.cards.splice(index, 1);
+	}
+	return;
+      }
+      // Otherwise, restore the previous state of the card.
+      this.cards[index].data.front = this.cards[index].originalFront;
+      this.cards[index].data.back = this.cards[index].originalBack;
       this.cards[index].editing = false;
     },
-    saveEdit: function(index) {	
-      fetch('/api/cards/' + this.cards[index].data.id, {
-	method: 'PUT',
-	headers: {
-	  'Content-Type': 'application/json',
+    saveEdit: function(index) {
+      // Can't save an empty card.
+      if (this.cards[index].data.front === '' ||
+	  this.cards[index].data.back === '') {
+	window.alert('Card must have both front and back text!');
+	return;
+      }
+
+      // If we haven't changed anything, don't bother saving.
+      if (this.cards[index].data.front === this.cards[index].originalFront &&
+	  this.cards[index].data.back === this.cards[index].originalBack) {
+	this.cards[index].editing = false;
+	return;
+      }
+
+      // If this is a new card, then call the create URL. We'll also need
+      // to update the id afterwards.
+      if (this.cards[index].new) {
+	fetch('/api/cards/create', {
+	  method: 'PUT',
+	  headers: {
+	    'Content-Type': 'application/json',
+	  },
+	  body: JSON.stringify(this.cards[index].data),
+	}).then(response => {
+	    if (!response.ok) {
+	      return Promise.reject(new Error(response.statusText));
+	    }
+	  })
+	  .then(response => response.json())
+	  .then(data => {
+	    this.cards.new = false;
+	    this.cards[index].id = data.id;
+	    this.cards[index].editing = false;
+	  })
+	  .catch(error => {
+	    console.error('Error in save:', error.message)
+	    window.alert('Error in save: ' + error.message)
+	  });
+      } else {
+	fetch('/api/cards/' + this.cards[index].data.id, {
+	  method: 'PUT',
+	  headers: {
+	    'Content-Type': 'application/json',
+	  },
+	  body: JSON.stringify(this.cards[index].data),
+	}).then(
+	  response => {
+	    if (response.ok) {
+	      this.cards[index].editing = false;
+	    } else {
+	      return Promise.reject(new Error(response.statusText));
+	    }
+	  })
+	  .catch(error => {
+	    console.error('Error in save:', error.message)
+	    window.alert('Error in save: ' + error.message)
+	  });
+      }
+    },
+    newCard: function() {
+      var newCard = {
+	data: {
+	  front: '',
+	  back: '',
+	  tag: [],
 	},
-	body: JSON.stringify(this.cards[index].data),
-      }).then(
-	response => {
-	  if (response.status !== 200) {
-	    // TODO(piotrf): figure out how to raise this error as a
-	    // notification.
-	    response.json().then(data => {
-	      console.error('Request error: ', data.error);
-	    });
-	    return;
-	  }
-	})
-	.catch(error => console.error('Fetch error:', error));
-      this.cards[index].editing = false;
-    }
+	editing: true,
+	new: true,
+	originalFront: '',
+	originalBack: '',
+      }
+      this.cards.unshift(newCard);
+    },
   },
 });
