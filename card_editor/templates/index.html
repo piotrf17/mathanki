@@ -28,30 +28,14 @@
       <div id="cards">
 	<button class="newcardbutton" v-on:click.stop="newCard()">New Card</button>
 	<div v-for="(card, index) in cards" :key="card.data.id">
-	  <!-- TODO(piotrf): using v-html on user content is a bad idea! -->
-	  <div v-if="card.editing" class="editingcardpair">
-	    <div class="editingcardrow">
-	      <div v-html="card.data.front" class="card"></div>
-	      <div v-html="card.data.back" class="card"></div>
-	    </div>
-	    <div class="editingcardrow">
-	      <div class="editingcard">
-		<textarea v-model="card.data.front" draggable='false'></textarea>
-	      </div>
-	      <div class="editingcard">
-		<textarea v-model="card.data.back" draggable='false'></textarea>
-	      </div>
-	    </div>
-	    <div class="editingcardbuttons">
-	      <button class="savebutton" v-on:click.stop="saveEdit(index)">Save</button>
-	      <button class="cancelbutton" v-on:click.stop="cancelEdit(index)">Cancel</button>
-	      <button v-on:click.stop="deleteCard(index)">Delete</button>
-	    </div>
-	  </div>	  
-	  <div v-else class="cardpair" v-on:click="startEdit(index)">
-	    <div v-html="card.data.front" class="card"></div>
-	    <div v-html="card.data.back" class="card"></div>
-	  </div>
+	  <card-component
+	    v-bind:key="card.data.id"
+	    v-bind:card="card.data"
+	    v-bind:is-new="card.isNew"
+	    v-bind:initial-editing="card.editing"
+	    v-on:save-card="saveCard(index, $event)"
+	    v-on:remove="deleteCard(index)"
+	  ></card-component>
 	</div>
       </div>
     </div>

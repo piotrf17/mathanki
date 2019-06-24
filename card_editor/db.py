@@ -78,8 +78,6 @@ class NoteDB(object):
 
     note.last_edited_ts = time.time()
 
-    note.id = 22
-
     # First, check if this note even exists.
     result = self.conn.execute('SELECT EXISTS(SELECT * FROM notes WHERE id=?)',
                                (note.id,))

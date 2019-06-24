@@ -26,6 +26,7 @@ def cards():
     json_cards.append(json_format.MessageToDict(card))
   return jsonify(json_cards)
 
+# TODO(piotrf): rename to /api/cards
 @bp.route('/api/cards/create', methods=('PUT',))
 def create_card():
   data = request.get_json()

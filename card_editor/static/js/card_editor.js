@@ -1,81 +1,135 @@
-var data = {
-  cards: [
-  ],
-};
-
-var app = new Vue({
-  el: '#app',
-  data: data,
+var cardComponent = {
+  data: function() {
+    return {
+      editing: this.initialEditing,
+      originalFront: '',
+      originalBack: '',
+    }
+  },
+  props: ['card', 'isNew', 'initialEditing'],
+  created: function() {
+    this.debouncedRenderMathJax = _.debounce(this.renderMathJax, 100);
+  },
   watch: {
-    cards: {
-      handler: function(newCards, oldCards) {
+    card: {
+      handler: function(newCard, oldCard) {
 	this.debouncedRenderMathJax();
       },
       deep: true
     },
   },
-  created: function() {
-    this.debouncedRenderMathJax = _.debounce(this.renderMathJax, 100);
-  },
-  mounted(){
-    fetch('/api/cards')
-      .then(r => r.json())
-      .then(json => {
-	this.cards = json.map(x => { var rObj = {}; rObj.data = x; return rObj; });
-	for (var i = 0; i < data.cards.length; ++i) {
-	  Vue.set(this.cards[i], 'editing', false);
-	}
-      });
-    this.renderMathJax();
-  },
   methods: {
     renderMathJax: function() {
       this.$nextTick(function() {
-	// TODO(piotrf): could probably get better performance specifying
-	// which element to typeset.
-	MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+	MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.$el]);
       })
     },
-    startEdit: function(index) {
-      this.cards[index].originalFront = this.cards[index].data.front;
-      this.cards[index].originalBack = this.cards[index].data.back;
-      this.cards[index].editing = true;
+    startEdit: function() {
+      this.originalFront = this.card.front;
+      this.originalBack = this.card.back;
+      this.editing = true;
+      this.renderMathJax();
+    },
+    saveEdit: function() {
+      // Can't save an empty card.
+      if (this.card.front === '' || this.card.back === '') {
+	window.alert('Card must have both front and back text!');
+	return;
+      }
+
+      this.editing = false;
+      this.renderMathJax();
+      
+      // Only emit a save event if something has changed.
+      if (this.card.front !== this.originalFront ||
+	  this.card.back !== this.originalBack) {
+	this.$emit('save-card', this.card);
+      }
     },
     cancelEdit: function(index) {
       // If this is a new card, we want to either outright delete it if it
       // blank, or alert if there is anything entered before deleting. Either
       // way, there is nothing to restore.
-      if (this.cards[index].new) {
-	if ((this.cards[index].data.front === '' &&
-	     this.cards[index].data.back === '') ||
+      if (this.isNew) {
+	if ((this.card.front === '' &&
+	     this.card.back === '') ||
 	    window.confirm('Do you want to lose all input and abandon this new card?')) {
-	  this.cards.splice(index, 1);
+	  this.$emit('remove');
 	}
 	return;
       }
       // Otherwise, restore the previous state of the card.
-      this.cards[index].data.front = this.cards[index].originalFront;
-      this.cards[index].data.back = this.cards[index].originalBack;
-      this.cards[index].editing = false;
+      this.card.front = this.originalFront;
+      this.card.back = this.originalBack;
+      this.editing = false;
+      this.renderMathJax();
     },
-    saveEdit: function(index) {
-      // Can't save an empty card.
-      if (this.cards[index].data.front === '' ||
-	  this.cards[index].data.back === '') {
-	window.alert('Card must have both front and back text!');
-	return;
-      }
+  },
+  // TODO(piotrf): do I need to use v-html?
+  template: `
+<div v-if="editing" class="editingcardpair">
+  <div class="editingcardrow">
+    <div v-html="card.front" class="card"></div>
+    <div v-html="card.back" class="card"></div>
+  </div>
+  <div class="editingcardrow">
+    <div class="editingcard">
+      <textarea v-model="card.front" draggable='false'></textarea>
+    </div>
+    <div class="editingcard">
+      <textarea v-model="card.back" draggable='false'></textarea>
+    </div>
+  </div>
+  <div class="editingcardbuttons">
+    <button class="savebutton" v-on:click.stop="saveEdit">Save</button>
+    <button class="cancelbutton" v-on:click.stop="cancelEdit">Cancel</button>
+    <button v-on:click.stop="$emit('remove')">Delete</button>
+  </div>
+</div>	  
+<div v-else class="cardpair" v-on:click="startEdit">
+  <div v-html="card.front" class="card"></div>
+  <div v-html="card.back" class="card"></div>
+</div>
+`
+}
 
-      // If we haven't changed anything, don't bother saving.
-      if (this.cards[index].data.front === this.cards[index].originalFront &&
-	  this.cards[index].data.back === this.cards[index].originalBack) {
-	this.cards[index].editing = false;
-	return;
+var app = new Vue({
+  el: '#app',
+  components: {
+    'card-component': cardComponent,
+  },
+  data: {
+    cards: [],
+  },
+  mounted: function() {
+    fetch('/api/cards')
+      .then(r => r.json())
+      .then(json => {
+	this.cards = json.map(x => { var rObj = {}; rObj.data = x; return rObj; });
+	for (var i = 0; i < this.cards.length; ++i) {
+	  Vue.set(this.cards[i], 'editing', false);
+	}
+	this.cards.sort((a, b) => b.data.createdTs - a.data.createdTs);
+      });
+  },
+  methods: {
+    newCard: function() {
+      var newCard = {
+	data: {
+	  front: '',
+	  back: '',
+	  tag: [],
+	},
+	isNew: true,
+	editing: true,
       }
-
+      this.cards.unshift(newCard);
+    },
+    saveCard: function(index, card) {
+      this.cards[index].data = card;
       // If this is a new card, then call the create URL. We'll also need
       // to update the id afterwards.
-      if (this.cards[index].new) {
+      if (this.cards[index].isNew) {
 	fetch('/api/cards/create', {
 	  method: 'PUT',
 	  headers: {
@@ -86,11 +140,12 @@ var app = new Vue({
 	    if (!response.ok) {
 	      return Promise.reject(new Error(response.statusText));
 	    }
+	  return response;
 	  })
 	  .then(response => response.json())
 	  .then(data => {
-	    this.cards.new = false;
-	    this.cards[index].id = data.id;
+	    this.cards[index].isNew = false;
+	    this.cards[index].data.id = data.id;
 	    this.cards[index].editing = false;
 	  })
 	  .catch(error => {
@@ -118,21 +173,14 @@ var app = new Vue({
 	  });
       }
     },
-    newCard: function() {
-      var newCard = {
-	data: {
-	  front: '',
-	  back: '',
-	  tag: [],
-	},
-	editing: true,
-	new: true,
-	originalFront: '',
-	originalBack: '',
-      }
-      this.cards.unshift(newCard);
-    },
     deleteCard: function(index) {
+      // For new cards, just delete them from the array. They haven't yet been
+      // saved to the server.
+      if (this.cards[index].isNew) {
+	this.cards.splice(index, 1);
+	return;
+      }
+      // For non-new cards, confirm before actually deleting.
       if (!window.confirm('Really delete the card?')) {
 	return;
       }
