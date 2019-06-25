@@ -67,17 +67,26 @@ var cardComponent = {
   },
   // TODO(piotrf): do I need to use v-html?
   template: `
-<div v-if="editing" class="editingcardpair">
-  <div class="editingcardrow">
-    <div v-html="card.front" class="card"></div>
-    <div v-html="card.back" class="card"></div>
-  </div>
-  <div class="editingcardrow">
-    <div class="editingcard">
-      <textarea v-model="card.front" draggable='false'></textarea>
+<div v-if="editing" class="editingnote">
+  <div>
+    <div class="editingnotecards">
+      <div>
+        <div v-html="card.front" class="card"></div>
+        <div v-html="card.back" class="card"></div>
+      </div>
+      <div>
+        <div class="editingcardtext">
+          <textarea v-model="card.front" draggable='false'></textarea>
+        </div>
+        <div class="editingcardtext">
+          <textarea v-model="card.back" draggable='false'></textarea>
+        </div>
+      </div>
     </div>
-    <div class="editingcard">
-      <textarea v-model="card.back" draggable='false'></textarea>
+    <div class="editingcardtags">
+      <ul>
+        <li v-for="tag in card.tag">{{ tag }}</span>
+      </ul>
     </div>
   </div>
   <div class="editingcardbuttons">
@@ -86,9 +95,14 @@ var cardComponent = {
     <button v-on:click.stop="$emit('remove')">Delete</button>
   </div>
 </div>	  
-<div v-else class="cardpair" v-on:click="startEdit">
+<div v-else class="note" v-on:click="startEdit">
   <div v-html="card.front" class="card"></div>
   <div v-html="card.back" class="card"></div>
+  <div class="tags">
+    <ul>
+      <li v-for="tag in card.tag">{{ tag }}</span>
+    </ul>
+  </div>
 </div>
 `
 }
