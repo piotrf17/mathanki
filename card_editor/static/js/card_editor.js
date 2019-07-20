@@ -4,6 +4,8 @@ var cardComponent = {
       editing: this.initialEditing,
       originalFront: '',
       originalBack: '',
+      originalTags: [],
+      newtag: '',
     }
   },
   props: ['card', 'isNew', 'initialEditing'],
@@ -27,6 +29,7 @@ var cardComponent = {
     startEdit: function() {
       this.originalFront = this.card.front;
       this.originalBack = this.card.back;
+      this.originalTags = [...this.card.tag];
       this.editing = true;
       this.renderMathJax();
     },
@@ -41,12 +44,23 @@ var cardComponent = {
       this.renderMathJax();
       
       // Only emit a save event if something has changed.
+      var tagsChanged = false;
+      if (this.card.tag.length != this.originalTags.length) {
+	tagsChanged = true;
+      } else {
+	for (var i = 0; i < this.card.tag.length; ++i) {
+	  if (this.card.tag[i] !== this.originalTags[i]) {
+	    tagsChanged = true;
+	    break;
+	  }
+	}
+      }
       if (this.card.front !== this.originalFront ||
-	  this.card.back !== this.originalBack) {
+	  this.card.back !== this.originalBack || tagsChanged) {
 	this.$emit('save-card', this.card);
       }
     },
-    cancelEdit: function(index) {
+    cancelEdit: function() {
       // If this is a new card, we want to either outright delete it if it
       // blank, or alert if there is anything entered before deleting. Either
       // way, there is nothing to restore.
@@ -61,9 +75,19 @@ var cardComponent = {
       // Otherwise, restore the previous state of the card.
       this.card.front = this.originalFront;
       this.card.back = this.originalBack;
+      this.card.tag = [...this.originalTags];
       this.editing = false;
+      this.newtag = '';
       this.renderMathJax();
     },
+    addTag: function() {
+      if (this.newtag == '') return;
+      this.card.tag.push(this.newtag);
+      this.newtag = '';
+    },
+    deleteTag: function(index) {
+      this.card.tag.splice(index, 1);
+    }
   },
   // TODO(piotrf): do I need to use v-html?
   template: `
@@ -85,8 +109,15 @@ var cardComponent = {
     </div>
     <div class="editingcardtags">
       <ul>
-        <li v-for="tag in card.tag">{{ tag }}</span>
+        <li v-for="(tag, index) in card.tag">
+          {{ tag }}
+          <button v-on:click.stop="deleteTag(index)">x</button>
+        </li>
       </ul>
+      <span>
+        <input v-model="newtag">
+        <button v-on:click.stop="addTag">Add</button>
+      </span>
     </div>
   </div>
   <div class="editingcardbuttons">
@@ -100,7 +131,7 @@ var cardComponent = {
   <div v-html="card.back" class="card"></div>
   <div class="tags">
     <ul>
-      <li v-for="tag in card.tag">{{ tag }}</span>
+      <li v-for="tag in card.tag">{{ tag }}</li>
     </ul>
   </div>
 </div>

@@ -24,6 +24,13 @@ div.note div.card {
 div.note div.tags {
     display: table-cell;
 }
+div.note div.tags li {
+    list-style: none;
+    border: 1px solid black;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 5px 10px;
+}
 
 div.editingnote {
     background-color: #69d2e7;
@@ -51,9 +58,31 @@ div.editingnote textarea {
     height: 100%;
     resize: none;
 }
+
 div.editingcardtags {
     display: table-cell;
 }
+div.editingcardtags ul {
+    padding: 0px 0px;
+}
+div.editingcardtags li {
+    list-style: none;
+    background-color: #e7ce69;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 5px 10px;
+}
+div.editingcardtags li button {
+    background-color: white;
+    border: 2px solid white;
+    margin: -2px 5px;
+    float: right;
+}
+div.editingcardtags li button:hover {
+    background-color: #e7ce69;
+    border: 2px solid white;
+}
+
 div.editingcardbuttons {
     padding: 5px 0px;
     text-align: center;
