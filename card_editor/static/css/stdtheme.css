@@ -1,11 +1,55 @@
+body {
+    background: #eee;
+}
+
+div#container {
+    width: 1250px;
+    margin: 0px 100px;
+    padding: 10px 50px;
+    background: #fff;
+}
+
 div.title {
     text-align: center;
     font-size: 20px;
 }
 
+div#query {
+    padding: 20px;
+    border: 1px solid black;
+}
+div#querysearch {
+    margin: 10px 0px;
+}
+button.querytag {
+    border: 1px solid black;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 5px 10px;
+    background-color: #fff;
+}
+button.querytag:hover {
+    background-color: #e7ce69;
+}
+
 div#cards {
     padding: 0px 20px;
     border-spacing: 10px 10px;
+}
+
+div.newcardbutton {
+    text-align: center;
+}
+div.newcardbutton button {
+    background-color: #69d2e7;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 10px;
+    font-size: 18px;
+}
+div.newcardbutton button:hover {
+    background-color: #fff;
+    border: 1px solid black;
 }
 
 div.note {
@@ -35,6 +79,7 @@ div.note div.tags li {
 div.editingnote {
     background-color: #69d2e7;
     width: 1200px;
+    border: 1px solid black;
 }
 div.editingnotecards {
     display: table-cell;

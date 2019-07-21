@@ -21,21 +21,37 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/stdtheme.css') }}">    
   </head>
   <body>
-    <div class="title">
-      <h1>Math Anki</h1>
-    </div>
-    <div id="app">
-      <div id="cards">
-	<button class="newcardbutton" v-on:click.stop="newCard()">New Card</button>
-	<div v-for="(card, index) in cards" :key="card.data.id">
-	  <card-component
-	    v-bind:key="card.data.id"
-	    v-bind:card="card.data"
-	    v-bind:is-new="card.isNew"
-	    v-bind:initial-editing="card.editing"
-	    v-on:save-card="saveCard(index, $event)"
-	    v-on:remove="deleteCard(index)"
-	  ></card-component>
+    <div id="container">
+      <div class="title">
+	<h1>Math Anki</h1>
+      </div>
+      <div id="app">
+	<div id="query">
+	  <div id="querysearch">
+	    <span>Search:  <input v-model="query" size="50"></span>
+	    <span>showing XX cards</span>
+	  </div>
+	  <div id="querytags">
+	    Tags:
+	    <button v-for="(tag, index) in queryTags" :key="tag.name" class="querytag">
+	      {% raw %}{{ tag.name }}{% endraw %}
+	    </span>
+	  </div>
+	</div>
+	<div id="cards">
+	  <div class="newcardbutton">
+	    <button v-on:click.stop="newCard()">+ New Card</button>
+	  </div>
+	  <div v-for="(card, index) in cards" :key="card.data.id">
+	    <card-component
+	      v-bind:key="card.data.id"
+	      v-bind:card="card.data"
+	      v-bind:is-new="card.isNew"
+	      v-bind:initial-editing="card.editing"
+	      v-on:save-card="saveCard(index, $event)"
+	      v-on:remove="deleteCard(index)"
+	      ></card-component>
+	  </div>
 	</div>
       </div>
     </div>

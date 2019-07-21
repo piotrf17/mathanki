@@ -145,16 +145,37 @@ var app = new Vue({
   },
   data: {
     cards: [],
+    query: '',
+    queryTags: [],
   },
   mounted: function() {
     fetch('/api/cards')
       .then(r => r.json())
       .then(json => {
+	// Unpack card data and sort by newest first.
 	this.cards = json.map(x => { var rObj = {}; rObj.data = x; return rObj; });
-	for (var i = 0; i < this.cards.length; ++i) {
-	  Vue.set(this.cards[i], 'editing', false);
-	}
 	this.cards.sort((a, b) => b.data.createdTs - a.data.createdTs);
+
+	// Calculate the tags present in the cards, and sort by most popular.
+	var tagToCount = new Map();
+	for (var i = 0; i < this.cards.length; ++i) {
+	  for (var j = 0; j < this.cards[i].data.tag.length; ++j) {
+	    var tag = this.cards[i].data.tag[j];
+	    if (tagToCount.has(tag)) {
+	      tagToCount.set(tag, tagToCount.get(tag) + 1);
+	    } else {
+	      tagToCount.set(tag, 1);
+	    }
+	  }
+	}
+	var sortedTags = Array.from(tagToCount.entries());
+	sortedTags.sort((a, b) => b[1] - a[1]);
+	for (var i = 0; i < sortedTags.length; ++i) {
+	  this.queryTags.push({
+	    'name': sortedTags[i][0],
+	    'selected': false
+	  });
+	}
       });
   },
   methods: {
