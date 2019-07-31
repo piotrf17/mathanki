@@ -153,7 +153,16 @@ var app = new Vue({
       .then(r => r.json())
       .then(json => {
 	// Unpack card data and sort by newest first.
-	this.cards = json.map(x => { var rObj = {}; rObj.data = x; return rObj; });
+	// If a card doesn't have any tags, create an empty array for it.
+	// This simplifies later code.
+	this.cards = json.map(x => {
+	  var rObj = {};
+	  rObj.data = x;
+	  if (!('tag' in rObj.data)) {
+	    rObj.data.tag = [];
+	  }
+	  return rObj;
+	});
 	this.cards.sort((a, b) => b.data.createdTs - a.data.createdTs);
 
 	// Calculate the tags present in the cards, and sort by most popular.
