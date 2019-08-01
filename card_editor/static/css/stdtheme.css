@@ -31,6 +31,12 @@ button.querytag {
 button.querytag:hover {
     background-color: #e7ce69;
 }
+button.querytag.selected {
+    background-color: #e7ce69;
+}
+button.querytag.selected:hover {
+    background-color: #fee7b4
+}
 
 div#cards {
     padding: 0px 20px;

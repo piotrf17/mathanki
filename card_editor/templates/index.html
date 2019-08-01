@@ -33,7 +33,12 @@
 	  </div>
 	  <div id="querytags">
 	    Tags:
-	    <button v-for="(tag, index) in queryTags" :key="tag.name" class="querytag">
+	    <button
+	      v-for="(tag, index) in queryTags"
+	      :key="tag.name"
+	      class="querytag"
+	      v-bind:class="{selected: tag.selected}"
+	      v-on:click.stop="toggleQueryTag(index)">
 	      {% raw %}{{ tag.name }}{% endraw %}
 	    </span>
 	  </div>
@@ -42,14 +47,14 @@
 	  <div class="newcardbutton">
 	    <button v-on:click.stop="newCard()">+ New Card</button>
 	  </div>
-	  <div v-for="(card, index) in cards" :key="card.data.id">
+	  <div v-for="card in filteredCards" :key="card.data.id">
 	    <card-component
 	      v-bind:key="card.data.id"
 	      v-bind:card="card.data"
 	      v-bind:is-new="card.isNew"
 	      v-bind:initial-editing="card.editing"
-	      v-on:save-card="saveCard(index, $event)"
-	      v-on:remove="deleteCard(index)"
+	      v-on:save-card="saveCard(card.data.id, $event)"
+	      v-on:remove="deleteCard(card.data.id)"
 	      ></card-component>
 	  </div>
 	</div>

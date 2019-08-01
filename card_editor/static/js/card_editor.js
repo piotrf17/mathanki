@@ -187,9 +187,26 @@ var app = new Vue({
 	}
       });
   },
+  computed: {
+    filteredCards: function() {
+      var selectedQueryTags = this.queryTags.filter(tag => tag.selected);
+      if (selectedQueryTags.length == 0) {
+	return this.cards;
+      } else {
+	return this.cards.filter(function (card) {
+	  for (const queryTag of selectedQueryTags) {
+	    if (!card.data.tag.includes(queryTag.name)) {
+	      return false;
+	    }
+	  }
+	  return true;
+	});
+      }
+    }
+  },
   methods: {
     newCard: function() {
-      var newCard = {
+      const newCard = {
 	data: {
 	  front: '',
 	  back: '',
@@ -200,7 +217,13 @@ var app = new Vue({
       }
       this.cards.unshift(newCard);
     },
-    saveCard: function(index, card) {
+    saveCard: function(id, card) {
+      const index = this.cards.findIndex(card => card.data.id == id);
+      if (index == -1) {
+	console.error('saveCard: no card with id', id);
+	return;
+      }
+      
       this.cards[index].data = card;
       // If this is a new card, then call the create URL. We'll also need
       // to update the id afterwards.
@@ -248,7 +271,13 @@ var app = new Vue({
 	  });
       }
     },
-    deleteCard: function(index) {
+    deleteCard: function(id) {
+      const index = this.cards.findIndex(card => card.data.id == id);
+      if (index == -1) {
+	console.error('deleteCard: no card with id', id);
+	return;
+      }
+      
       // For new cards, just delete them from the array. They haven't yet been
       // saved to the server.
       if (this.cards[index].isNew) {
@@ -273,5 +302,8 @@ var app = new Vue({
 	window.alert('Error in delete: ' + error.message)
       });
     },
+    toggleQueryTag: function(index) {
+      this.queryTags[index].selected = !this.queryTags[index].selected;
+    }
   },
 });
