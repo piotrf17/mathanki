@@ -138,6 +138,24 @@ var cardComponent = {
 `
 }
 
+function computeSortedTags(cards) {
+  // Calculate the tags present in the cards, and sort by most popular.
+  let tagToCount = new Map();
+  for (let i = 0; i < cards.length; ++i) {
+    for (let j = 0; j < cards[i].data.tag.length; ++j) {
+      const tag = cards[i].data.tag[j];
+      if (tagToCount.has(tag)) {
+	tagToCount.set(tag, tagToCount.get(tag) + 1);
+      } else {
+	tagToCount.set(tag, 1);
+      }
+    }
+  }
+  let sortedTags = Array.from(tagToCount.entries());
+  sortedTags.sort((a, b) => b[1] - a[1]);
+  return sortedTags;
+}
+
 var app = new Vue({
   el: '#app',
   components: {
@@ -165,23 +183,10 @@ var app = new Vue({
 	});
 	this.cards.sort((a, b) => b.data.createdTs - a.data.createdTs);
 
-	// Calculate the tags present in the cards, and sort by most popular.
-	var tagToCount = new Map();
-	for (var i = 0; i < this.cards.length; ++i) {
-	  for (var j = 0; j < this.cards[i].data.tag.length; ++j) {
-	    var tag = this.cards[i].data.tag[j];
-	    if (tagToCount.has(tag)) {
-	      tagToCount.set(tag, tagToCount.get(tag) + 1);
-	    } else {
-	      tagToCount.set(tag, 1);
-	    }
-	  }
-	}
-	var sortedTags = Array.from(tagToCount.entries());
-	sortedTags.sort((a, b) => b[1] - a[1]);
-	for (var i = 0; i < sortedTags.length; ++i) {
+	let sortedTags = computeSortedTags(this.cards);
+	for (const [tag, count] of sortedTags) {
 	  this.queryTags.push({
-	    'name': sortedTags[i][0],
+	    'name': tag,
 	    'selected': false
 	  });
 	}
@@ -189,6 +194,7 @@ var app = new Vue({
   },
   computed: {
     filteredCards: function() {
+      this.renderMathJax();
       var selectedQueryTags = this.queryTags.filter(tag => tag.selected);
       if (selectedQueryTags.length == 0) {
 	return this.cards;
@@ -205,6 +211,11 @@ var app = new Vue({
     }
   },
   methods: {
+    renderMathJax: function() {
+      this.$nextTick(function() {
+	MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+      })
+    },
     newCard: function() {
       const newCard = {
 	data: {
@@ -304,6 +315,22 @@ var app = new Vue({
     },
     toggleQueryTag: function(index) {
       this.queryTags[index].selected = !this.queryTags[index].selected;
+      
+      let selectedTags = new Set();
+      for (const queryTag of this.queryTags) {
+	if (queryTag.selected) {
+	  selectedTags.add(queryTag.name);
+	}
+      }
+      
+      let sortedTags = computeSortedTags(this.filteredCards);
+      this.queryTags.splice(0);
+      for (const [tag, count] of sortedTags) {
+	this.queryTags.push({
+	  'name': tag,
+	  'selected': selectedTags.has(tag),
+	});
+      }
     }
   },
 });

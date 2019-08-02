@@ -29,7 +29,7 @@
 	<div id="query">
 	  <div id="querysearch">
 	    <span>Search:  <input v-model="query" size="50"></span>
-	    <span>showing XX cards</span>
+	    <span>showing {% raw %}{{ filteredCards.length }}{% endraw %} cards</span>
 	  </div>
 	  <div id="querytags">
 	    Tags:
