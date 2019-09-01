@@ -20,6 +20,18 @@ var cardComponent = {
       deep: true
     },
   },
+  computed: {
+    createdString: function() {
+      return (new Date(this.card.createdTs * 1000)).toLocaleString();
+    },
+    lastEditedString: function() {
+      if (this.card.lastEditedTs > 0.0) {
+	return (new Date(this.card.lastEditedTs * 1000)).toLocaleString();
+      } else {
+	return '<never>';
+      }
+    },
+  },
   methods: {
     renderMathJax: function() {
       this.$nextTick(function() {
@@ -124,6 +136,10 @@ var cardComponent = {
     <button class="savebutton" v-on:click.stop="saveEdit">Save</button>
     <button class="cancelbutton" v-on:click.stop="cancelEdit">Cancel</button>
     <button v-on:click.stop="$emit('remove')">Delete</button>
+  </div>
+  <div>
+    <span>Created: {{ createdString }}</span>
+    <span>Last edited: {{ lastEditedString }}</span>
   </div>
 </div>	  
 <div v-else class="note" v-on:click="startEdit">

@@ -12,7 +12,8 @@ from card_editor import note_pb2
 def init_app(app):
   app.teardown_appcontext(close_db)
   app.cli.add_command(init_db_command)
-  app.cli.add_command(add_notes_command)
+  app.cli.add_command(import_notes_command)
+  app.cli.add_command(export_notes_command)
 
 class NoteDB(object):
   def __init__(self, conn):
@@ -124,11 +125,11 @@ def init_db_command():
     init_db()
     click.echo('Initialized the database.')
 
-@click.command('add-notes')
+@click.command('import-notes')
 @with_appcontext
 @click.argument('notes_csv_file')
-def add_notes_command(notes_csv_file):
-  """Add notes from a csv file."""
+def import_notes_command(notes_csv_file):
+  """Import notes from a csv file."""
   notes = []
   with open(notes_csv_file) as csvfile:
     reader = csv.reader(csvfile, delimiter=';', quotechar='"')
@@ -141,9 +142,28 @@ def add_notes_command(notes_csv_file):
         note.tag.append(tag)
       notes.append(note)
 
-  if click.confirm('Add {} notes?'.format(len(notes))):
+  # TODO(piotrf): deduping?
+  if click.confirm('Import {} notes?'.format(len(notes))):
     db = get_db()
     for note in notes:
       db.insert_note(note)
-    click.echo('Added notes.')
+    click.echo('Imported notes.')
 
+@click.command('export-notes')
+@with_appcontext
+@click.argument('notes_csv_file')
+def export_notes_command(notes_csv_file):
+  """Export notes to a csv file."""
+  with open(notes_csv_file, 'w') as csvfile:
+    # TODO(piotrf): set last_exported_ts, and then only export cards with
+    # last_edited_ts greater than last_exported_ts.
+    writer = csv.writer(csvfile, delimiter=';', quotechar='"')
+    db = get_db()
+    notes = db.get_notes()
+    for note in notes:
+      row = [
+        note.id,
+        note.front,
+        note.back,
+      ]
+      writer.writerow(row)
