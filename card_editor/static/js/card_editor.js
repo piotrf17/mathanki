@@ -179,6 +179,7 @@ var app = new Vue({
   },
   data: {
     cards: [],
+    cardOrder: 'creation_newest',
     query: '',
     queryTags: [],
   },
@@ -197,8 +198,6 @@ var app = new Vue({
 	  }
 	  return rObj;
 	});
-	this.cards.sort((a, b) => b.data.createdTs - a.data.createdTs);
-
 	let sortedTags = computeSortedTags(this.cards);
 	for (const [tag, count] of sortedTags) {
 	  this.queryTags.push({
@@ -211,6 +210,29 @@ var app = new Vue({
   computed: {
     filteredCards: function() {
       this.renderMathJax();
+      const cardOrder = this.cardOrder;
+      this.cards.sort(function(a, b) {
+	if (cardOrder == 'creation_newest')
+	  return b.data.createdTs - a.data.createdTs;
+	if (cardOrder == 'creation_oldest')
+	  return a.data.createdTs - b.data.createdTs;
+	const aLastEditedTs = 'lastEditedTs' in a.data ? a.data.lastEditedTs : 0;
+	const bLastEditedTs = 'lastEditedTs' in b.data ? b.data.lastEditedTs : 0;
+	if (cardOrder == 'edited_newest') {
+	  if (aLastEditedTs == bLastEditedTs) {
+	    return b.data.createdTs - a.data.createdTs;
+	  } else {
+	    return bLastEditedTs - aLastEditedTs;
+	  }
+	}
+	if (cardOrder == 'edited_oldest') {
+	  if (aLastEditedTs == bLastEditedTs) {
+	    return a.data.createdTs - b.data.createdTs;
+	  } else {
+	    return aLastEditedTs - bLastEditedTs;
+	  }
+	}
+      });
       var selectedQueryTags = this.queryTags.filter(tag => tag.selected);
       if (selectedQueryTags.length == 0) {
 	return this.cards;

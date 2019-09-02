@@ -29,7 +29,14 @@
 	<div id="query">
 	  <div id="querysearch">
 	    <span>Search:  <input v-model="query" size="50"></span>
-	    <span>showing {% raw %}{{ filteredCards.length }}{% endraw %} cards</span>
+	    <span>showing {% raw %}{{ filteredCards.length }}{% endraw %} cards.</span>
+	    <span>Sort by:</span>
+	    <select v-model="cardOrder">
+	      <option value="creation_newest">Creation (newest to oldest)</option>
+	      <option value="creation_oldest">Creation (oldest to newest)</option>
+	      <option value="edited_newest">Edited (newest to oldest)</option>
+	      <option value="edited_oldest">Edited (oldest to newest)</option>
+	    </select>
 	  </div>
 	  <div id="querytags">
 	    Tags:
