@@ -156,7 +156,8 @@ def export_notes_command(notes_csv_file):
   """Export notes to a csv file."""
   with open(notes_csv_file, 'w') as csvfile:
     # TODO(piotrf): set last_exported_ts, and then only export cards with
-    # last_edited_ts greater than last_exported_ts.
+    # last_edited_ts greater than last_exported_ts. But include an option to
+    # export all in case the file was lost before adding to anki.
     writer = csv.writer(csvfile, delimiter=';', quotechar='"')
     db = get_db()
     notes = db.get_notes()
