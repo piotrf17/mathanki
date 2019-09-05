@@ -166,5 +166,6 @@ def export_notes_command(notes_csv_file):
         note.id,
         note.front,
         note.back,
+        ','.join(note.tag),
       ]
       writer.writerow(row)
