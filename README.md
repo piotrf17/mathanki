@@ -4,13 +4,13 @@
 
 1. Create a virtual env for the repository.
 1. Install requirements.
-```bash
-$ pip install -r requirements.txt
-```
+   ```bash
+   $ pip install -r requirements.txt
+   ```
 1. Run card editor.
-```bash
-$ flask run
-```
+   ```bash
+   $ flask run
+   ```
 
 ## Usage
 
@@ -26,18 +26,18 @@ $ flask init-db
 1. First, export the cards from Anki.
 
 1. Ensure the virtual env is activated. Then run:
-```bash
-$ flask import-notes /path/to/notes.csv
-```
+   ```bash
+   $ flask import-notes /path/to/notes.csv
+   ```
 
 ### Exporting cards to Anki
 
 TODO add Anki deck setup.
 
 1. Run:
-``` bash
-$ flask export-notes /path/to/notes.csv
-```
+   ``` bash
+   $ flask export-notes /path/to/notes.csv
+   ```
 
 1. In Anki, "File > Import", select the file.
 
