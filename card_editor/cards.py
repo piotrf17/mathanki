@@ -34,7 +34,7 @@ def create_card():
   db = get_db()
   note_id = db.insert_note(note)
   response = {}
-  response['id'] = note_id
+  response['id'] = str(note_id)
   return make_response(jsonify(response), 200)
   
 
@@ -42,6 +42,7 @@ def create_card():
 def single_card(note_id):
   if request.method == 'PUT':
     data = request.get_json()
+    current_app.logger.info(data);
     if data['id'] != note_id:
       return error_response('request id does not match data')
     note = json_format.ParseDict(data, note_pb2.Note())

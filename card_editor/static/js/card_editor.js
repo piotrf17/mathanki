@@ -70,6 +70,9 @@ var cardComponent = {
       if (this.card.front !== this.originalFront ||
 	  this.card.back !== this.originalBack || tagsChanged) {
 	this.$emit('save-card', this.card);
+	if (typeof this.isNew === 'undefined' || !this.isNew) {
+	  this.card.lastEditedTs = Date.now() / 1000.0;
+	}
       }
     },
     cancelEdit: function() {
@@ -260,6 +263,8 @@ var app = new Vue({
 	  front: '',
 	  back: '',
 	  tag: [],
+	  createdTs: Date.now() / 1000.0,
+	  lastEditedTs: 0.0,
 	},
 	isNew: true,
 	editing: true,
