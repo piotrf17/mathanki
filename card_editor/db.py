@@ -161,6 +161,7 @@ def export_notes_command(notes_csv_file):
     writer = csv.writer(csvfile, delimiter=';', quotechar='"')
     db = get_db()
     notes = db.get_notes()
+    notes.sort(key=lambda x: x.created_ts)
     for note in notes:
       row = [
         note.id,
