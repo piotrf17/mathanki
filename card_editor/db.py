@@ -127,19 +127,21 @@ def init_db_command():
 
 @click.command('import-notes')
 @with_appcontext
+@click.option('--delimiter', default='\t')
 @click.argument('notes_csv_file')
-def import_notes_command(notes_csv_file):
+def import_notes_command(delimiter, notes_csv_file):
   """Import notes from a csv file."""
   notes = []
   with open(notes_csv_file) as csvfile:
-    reader = csv.reader(csvfile, delimiter=';', quotechar='"')
+    reader = csv.reader(csvfile, delimiter=delimiter, quotechar='"')
     for row in reader:
       assert len(row)==3
       note = note_pb2.Note()
       note.front = row[0]
       note.back = row[1]
-      for tag in row[2].split(','):
-        note.tag.append(tag)
+      if row[2]:
+        for tag in row[2].split(','):
+          note.tag.append(tag)
       notes.append(note)
 
   # TODO(piotrf): deduping?
